@@ -8,10 +8,21 @@ import (
 	"github.com/shayd3/advent-of-code-2021/inputs"
 )
 
+
 func Day03() {
 	inputs := inputs.Day03
-	gamma := ""
-	epsilon := ""
+	gamma,epsilon := getDiagnosticReportResults(inputs)
+	fmt.Printf("Report Product: %d", getReportProduct(gamma, epsilon))
+	
+}
+
+func getReportProduct(gamma int64, epsilon int64) int64 {
+	return gamma * epsilon
+}
+
+func getDiagnosticReportResults(inputs []string) (gamma int64, epsilon int64) {
+	gammaRaw := ""
+	epsilonRaw := ""
 
 	for col := 0; col < len(inputs[0]); col++ {
 		zeros := 0
@@ -25,14 +36,11 @@ func Day03() {
 			}
 		}
 		most, least := getFrequency(ones, zeros)
-		gamma += strconv.Itoa(most)
-		epsilon += strconv.Itoa(least)
+		gammaRaw += strconv.Itoa(most)
+		epsilonRaw += strconv.Itoa(least)
 	}
-	fmt.Printf("Gamma: %s, Epsilon: %s\n", gamma, epsilon)
-	fmt.Printf("Gamma * Epsilon: %d", convertToBinary(gamma) * convertToBinary(epsilon))
-	
+	return convertToBinary(gammaRaw), convertToBinary(epsilonRaw)
 }
-
 func convertToBinary(str string) int64 {
 	output, err := strconv.ParseInt(str, 2, 64)
 	if err != nil {
