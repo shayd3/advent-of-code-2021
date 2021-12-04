@@ -19,16 +19,20 @@ type ReportResult struct {
 func Day03() {
 	inputs := inputs.Day03
 	reportResults := generateReportResults(inputs)
-	fmt.Printf("Report Product: %d", getReportProduct(reportResults.gamma, reportResults.epsilon))
+	fmt.Printf("Report Product: %d", getPowerConsumption(reportResults))
 	
-}
-
-func getReportProduct(gamma int64, epsilon int64) int64 {
-	return gamma * epsilon
 }
 
 func generateReportResults(inputs []string) ReportResult {
 	reportResults := ReportResult{}
+	gamma, epsilon := getPowerConsumptionProperties(inputs)
+
+	reportResults.gamma = gamma
+	reportResults.epsilon = epsilon
+	return reportResults
+}
+
+func getPowerConsumptionProperties(inputs []string) (gamma int64, epsilon int64) {
 	gammaRaw := ""
 	epsilonRaw := ""
 
@@ -47,16 +51,8 @@ func generateReportResults(inputs []string) ReportResult {
 		gammaRaw += strconv.Itoa(most)
 		epsilonRaw += strconv.Itoa(least)
 	}
-	reportResults.gamma = convertToBinary(gammaRaw)
-	reportResults.epsilon = convertToBinary(epsilonRaw)
-	return reportResults
-}
-func convertToBinary(str string) int64 {
-	output, err := strconv.ParseInt(str, 2, 64)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return output
+
+	return convertToBinary(gammaRaw), convertToBinary(epsilonRaw)
 }
 
 func getFrequency(ones int, zeros int) (most int, least int) {
@@ -65,4 +61,16 @@ func getFrequency(ones int, zeros int) (most int, least int) {
 	} else {
 		return 0, 1
 	}
+}
+
+func convertToBinary(str string) int64 {
+	output, err := strconv.ParseInt(str, 2, 64)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return output
+}
+
+func getPowerConsumption(reportResult ReportResult) int64 {
+	return reportResult.gamma * reportResult.epsilon
 }
