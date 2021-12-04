@@ -8,11 +8,18 @@ import (
 	"github.com/shayd3/advent-of-code-2021/inputs"
 )
 
+type ReportResult struct {
+	gamma int64
+	epsilon int64
+	co2Scrubber int64
+	oxygenGenerator int64
+}
+
 
 func Day03() {
 	inputs := inputs.Day03
-	gamma,epsilon := getDiagnosticReportResults(inputs)
-	fmt.Printf("Report Product: %d", getReportProduct(gamma, epsilon))
+	reportResults := generateReportResults(inputs)
+	fmt.Printf("Report Product: %d", getReportProduct(reportResults.gamma, reportResults.epsilon))
 	
 }
 
@@ -20,7 +27,8 @@ func getReportProduct(gamma int64, epsilon int64) int64 {
 	return gamma * epsilon
 }
 
-func getDiagnosticReportResults(inputs []string) (gamma int64, epsilon int64) {
+func generateReportResults(inputs []string) ReportResult {
+	reportResults := ReportResult{}
 	gammaRaw := ""
 	epsilonRaw := ""
 
@@ -39,7 +47,9 @@ func getDiagnosticReportResults(inputs []string) (gamma int64, epsilon int64) {
 		gammaRaw += strconv.Itoa(most)
 		epsilonRaw += strconv.Itoa(least)
 	}
-	return convertToBinary(gammaRaw), convertToBinary(epsilonRaw)
+	reportResults.gamma = convertToBinary(gammaRaw)
+	reportResults.epsilon = convertToBinary(epsilonRaw)
+	return reportResults
 }
 func convertToBinary(str string) int64 {
 	output, err := strconv.ParseInt(str, 2, 64)
