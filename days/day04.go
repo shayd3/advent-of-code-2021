@@ -12,6 +12,7 @@ import (
 
 type BingoBoard struct {
 	board [5][5]BingoNumber
+	isComplete bool
 }
 
 type BingoNumber struct {
@@ -22,6 +23,7 @@ type BingoNumber struct {
 type Winner struct {
 	game BingoBoard
 	lastCalledNumber int
+	isFound bool
 }
 
 // Day04 Solution for AoC
@@ -33,11 +35,12 @@ func Day04() {
 	log.SetOutput(ioutil.Discard)
 	bingoCalls := inputs.BingoCalls
 	bingoBoards := inputs.BingoBoards
-	
+
 	games := makeBoards(bingoBoards)
-	winner := playGames(games, bingoCalls)
-	fmt.Printf("We have a winner!\nWinning game: %v\nLast called number: %d\n", winner.game.board, winner.lastCalledNumber)
-	fmt.Printf("Final standings: %d\n", calculateWinningBoard(winner))
+	winner, lastWinner := playGames(games, bingoCalls)
+	fmt.Printf("We have our first winner!\nWinning game: %v\nLast called number: %d\n", winner.game.board, winner.lastCalledNumber)
+	fmt.Printf("Final standings for first winner: %d\n", calculateWinningBoard(winner))
+	fmt.Printf("Final standings for last winner: %d\n", calculateWinningBoard(lastWinner))
 }
 
 func makeBoards(boardInput string) (bingoGames []BingoBoard) {
@@ -67,30 +70,37 @@ func makeBoards(boardInput string) (bingoGames []BingoBoard) {
 	return bingoGames
 }
 
-func playGames(games []BingoBoard, bingoCalls []int) Winner {
-	winner := Winner{}
+func playGames(games []BingoBoard, bingoCalls []int) (firstWinner Winner, lastWinner Winner) {
+	latestWinner := Winner{}
 	for turn, call := range bingoCalls {
 		log.Printf("Turn #%d : Number called: %d\n", turn, call)
 		// Loop over each game
 		for gameNumber, game := range games {
-			for rowNumber, row := range game.board {
-				for numPosition, num := range row {
-					if !num.marked && num.value == call {
-						log.Printf("Number found! Game: %d, Row: %d, Found: %d\n", gameNumber, rowNumber, call)
-						games[gameNumber].board[rowNumber][numPosition].marked = true
-						if checkBoard(games[gameNumber]){
-							winner.lastCalledNumber = call
-							winner.game = games[gameNumber]
-							return winner
+			// Skip completed games
+			if !games[gameNumber].isComplete {
+				for rowNumber, row := range game.board {
+					for numPosition, num := range row {
+						// Check only non-marked numbers
+						if !num.marked && num.value == call {
+							log.Printf("Number found! Game: %d, Row: %d, Found: %d\n", gameNumber, rowNumber, call)
+							games[gameNumber].board[rowNumber][numPosition].marked = true
+							if checkBoard(games[gameNumber]){
+								latestWinner.lastCalledNumber = call
+								latestWinner.game = games[gameNumber]
+								latestWinner.isFound = true
+								if !firstWinner.isFound {
+									firstWinner = latestWinner
+								}
+								games[gameNumber].isComplete = true
+							}
 						}
 					}
 				}
 			}
-			
 		}
 	}
-
-	return winner
+	lastWinner = latestWinner
+	return firstWinner, lastWinner
 }
 
 func checkBoard(game BingoBoard) bool {
