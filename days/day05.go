@@ -1,6 +1,7 @@
 package days
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -24,13 +25,81 @@ type Coordinate struct {
 // 4. Count all points on grid that are >= 2
 // 5. Return count
 func Day05() {
-	coordinatesInput := inputs.Day05Sample
+	// coordinatesInput := inputs.Day05Sample
+	coordinatesInput := inputs.Day05
 	lines := generateLines(coordinatesInput)
-	drawGrid(lines)
+	grid := drawGrid(lines)
+	gridPart1 := drawLinesOnGrid(grid, lines, false)
+	gridPart2 := drawLinesOnGrid(grid, lines, true)
 
+	fmt.Printf("Total number of overlapping points (Horizonal/Vertical): %d", countOverlappingPoints(gridPart1))
+	fmt.Printf("Total number of overlapping points (Horizonal/Vertical/Diag): %d", countOverlappingPoints(gridPart2))
 }
 
-func drawGrid(lines []Line) [][]int {
+func printGrid(grid [][]int) {
+	for _, row := range grid {
+		for _, val := range row {
+			fmt.Printf("%d ", val)
+		}
+		fmt.Println()
+	}
+}
+
+func countOverlappingPoints(grid [][]int) int {
+	count := 0
+	for _, row := range grid {
+		for _, val := range row {
+			if val >= 2 {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+// drawLinesOnGrid will draw lines on the grid from the 
+// list of lines
+func drawLinesOnGrid(grid [][]int, lines []Line, drawDiagonalLines bool) [][]int {
+	for _, line := range lines {
+		// Horizontal Line
+		if line.start.y == line.end.y {
+			init, ceiling := getLoopParameters(line.start.x, line.end.x)
+			for i := init; i <= ceiling; i++ {
+				grid[line.start.y][i]++
+			}
+			
+		}
+		// Vertical Line
+		if line.start.x == line.end.x {
+			init, ceiling := getLoopParameters(line.start.y, line.end.y)
+			for i := init; i <= ceiling; i++ {
+				grid[i][line.start.x]++
+			}
+		}
+
+		// Diagonal Line
+		if drawDiagonalLines {
+			
+		}
+		
+	}
+
+	return grid
+}
+
+func getLoopParameters(boundryA int, boundryB int) (init int, ceiling int) {
+	if boundryA < boundryB {
+		init = boundryA
+		ceiling = boundryB
+	} else {
+		init = boundryB
+		ceiling = boundryA
+	}
+	
+	return init, ceiling
+}
+
+func drawGrid(lines []Line) (grid [][]int) {
 	maxX := 0
 	maxY := 0
 
@@ -51,9 +120,10 @@ func drawGrid(lines []Line) [][]int {
 			maxY = line.end.y
 		}
 	}
-	grid := make([][]int, maxY)
+	// Add 1 for both the x and y axis for the slice size
+	grid = make([][]int, maxY + 1)
 	for i := range grid {
-		grid[i] = make([]int, maxX)
+		grid[i] = make([]int, maxX + 1)
 	}
 	return grid
 }
@@ -67,8 +137,10 @@ func generateLines(coordinatesInput []string) []Line {
 	for _, input := range coordinatesInput {
 		input = (strings.ReplaceAll(input, " ", ""))
 		coordinatePair := strings.Split(input, "->")
+
 		startCoordinateSplit := strings.Split(coordinatePair[0], ",")
 		endCoordinateSplit := strings.Split(coordinatePair[1], ",")
+		
 		startX, _ := strconv.Atoi(startCoordinateSplit[0])
 		startY, _ := strconv.Atoi(startCoordinateSplit[1])
 		endX, _ := strconv.Atoi(endCoordinateSplit[0])
