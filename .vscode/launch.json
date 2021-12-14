@@ -37,6 +37,14 @@
             "mode": "auto",
             "program": "main.go",
             "args": ["4"]
+        }, 
+        {
+            "name": "Day 05",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "main.go",
+            "args": ["5"]
         },
     ]
 }

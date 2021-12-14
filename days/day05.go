@@ -6,7 +6,6 @@ import (
 
 	"github.com/shayd3/advent-of-code-2021/inputs"
 )
-
 type Line struct {
 	start Coordinate
 	end Coordinate
@@ -27,8 +26,36 @@ type Coordinate struct {
 func Day05() {
 	coordinatesInput := inputs.Day05Sample
 	lines := generateLines(coordinatesInput)
-	grid := drawGrid(lines)
+	drawGrid(lines)
 
+}
+
+func drawGrid(lines []Line) [][]int {
+	maxX := 0
+	maxY := 0
+
+	for _, line := range lines {
+		// Check x
+		if line.start.x > maxX {
+			maxX = line.start.x
+		}
+		if line.end.x > maxX {
+			maxX = line.end.x
+		}
+
+		// Check y
+		if line.start.y > maxY {
+			maxY = line.start.y
+		}
+		if line.end.y > maxY {
+			maxY = line.end.y
+		}
+	}
+	grid := make([][]int, maxY)
+	for i := range grid {
+		grid[i] = make([]int, maxX)
+	}
+	return grid
 }
 
 // generateLines returns a slice of Lines that are 
