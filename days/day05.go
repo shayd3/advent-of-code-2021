@@ -2,6 +2,9 @@ package days
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"math"
 	"strconv"
 	"strings"
 
@@ -25,15 +28,17 @@ type Coordinate struct {
 // 4. Count all points on grid that are >= 2
 // 5. Return count
 func Day05() {
+	log.SetOutput(ioutil.Discard)
 	// coordinatesInput := inputs.Day05Sample
 	coordinatesInput := inputs.Day05
 	lines := generateLines(coordinatesInput)
-	grid := drawGrid(lines)
-	gridPart1 := drawLinesOnGrid(grid, lines, false)
-	gridPart2 := drawLinesOnGrid(grid, lines, true)
-
-	fmt.Printf("Total number of overlapping points (Horizonal/Vertical): %d", countOverlappingPoints(gridPart1))
-	fmt.Printf("Total number of overlapping points (Horizonal/Vertical/Diag): %d", countOverlappingPoints(gridPart2))
+	gridPt1 := drawGrid(lines)
+	gridPt2 := drawGrid(lines)
+	gridPt1 = drawLinesOnGrid(gridPt1, lines, false)
+	gridPt2 = drawLinesOnGrid(gridPt2, lines, true)
+	
+	fmt.Printf("Total number of overlapping points (Horizonal/Vertical): %d\n", countOverlappingPoints(gridPt1))
+	fmt.Printf("Total number of overlapping points (Horizonal/Vertical/Diag): %d\n", countOverlappingPoints(gridPt2))
 }
 
 func printGrid(grid [][]int) {
@@ -59,6 +64,8 @@ func countOverlappingPoints(grid [][]int) int {
 
 // drawLinesOnGrid will draw lines on the grid from the 
 // list of lines
+// TODO: The calculation of where to increment could be done better. 
+// Especially with the diagonal method
 func drawLinesOnGrid(grid [][]int, lines []Line, drawDiagonalLines bool) [][]int {
 	for _, line := range lines {
 		// Horizontal Line
@@ -79,12 +86,59 @@ func drawLinesOnGrid(grid [][]int, lines []Line, drawDiagonalLines bool) [][]int
 
 		// Diagonal Line
 		if drawDiagonalLines {
-			
+			isDiagonal, _, _ := getLineDetails(line)
+			if isDiagonal {
+				points := getDiagonalPoints(line)
+				for _,point := range points {
+					grid[point.y][point.x]++
+				}
+			}
 		}
 		
 	}
 
 	return grid
+}
+
+// if x1 < x2 -> Right
+// if x1 > x2 -> Left
+// if y1 < y2 -> Down
+// if y1 > y2 -> Up
+func getDiagonalPoints(line Line) []Coordinate {
+	coordinates := []Coordinate{}
+	_, _, yRange := getLineDetails(line)
+	for i := 0; i <= yRange; i++ {
+		log.Printf("Point #%d\n", i)
+		coordinate := Coordinate{}
+		// Right
+		if line.start.x < line.end.x {
+			coordinate.x = line.start.x + i
+		}
+		// Left
+		if line.start.x > line.end.x {
+			coordinate.x = line.start.x - i
+		}
+		// Down
+		if line.start.y < line.end.y {
+			coordinate.y = line.start.y + i
+		}
+		// Up
+		if line.start.y > line.end.y {
+			coordinate.y = line.start.y - i
+		}
+		coordinates = append(coordinates, coordinate)
+
+	}
+	return coordinates
+}
+
+
+func getLineDetails(line Line) (isDiagonal bool, xRange int, yRange int) {
+	xRange = int(math.Abs(float64(line.start.x - line.end.x)))
+	yRange = int(math.Abs(float64(line.start.y - line.end.y)))
+	isDiagonal = xRange == yRange
+
+	return isDiagonal, xRange, yRange
 }
 
 func getLoopParameters(boundryA int, boundryB int) (init int, ceiling int) {
