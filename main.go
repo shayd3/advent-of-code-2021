@@ -12,6 +12,7 @@ var funcMap = map[string]interface{}{
 	"3": days.Day03,
 	"4": days.Day04,
 	"5": days.Day05,
+	"6": days.Day06,
 }
 
 func main() {
