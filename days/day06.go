@@ -5,10 +5,6 @@ import (
 
 	"github.com/shayd3/advent-of-code-2021/inputs"
 )
-
-const NEW_BORN_LANTERNFISH_LIFE_TIMER = 8
-const LANTERNFISH_LIFE_TIMER = 6
-
 type Lanternfish struct {
 	lifespan int
 	lifespanRefresh bool
@@ -32,14 +28,15 @@ func simulateLanternfish(fishes []int, days int, newBornLifespan int, fishLifesp
 		fishPopulationSimulation[fish]++
 	}
 	for day := 0; day < days; day++ {
-		// Hold first value for all 0s
+		// Hold first value for all in index 0 and shift everything to the left
 		tmp := fishPopulationSimulation[0]
 		for i := 1; i < len(fishPopulationSimulation); i++ {
 			fishPopulationSimulation[i-1] = fishPopulationSimulation[i]
 		}
+
+		// Spawn new fish and reset all 0s to go to fishLifespanDayRefresh value
 		fishPopulationSimulation[fishLifespanDayRefresh] += tmp
 		fishPopulationSimulation[newBornLifespan] = tmp
-		//fmt.Printf("Fish population Day#%d => \n\t%v\n", day+1, fishPopulationSimulation)
 	}
 	
 
