@@ -29,7 +29,7 @@ func parseInput(input []string) []Entry {
 		signalPaterns := strings.Fields(valSplitOnDelim[0])
 		outputValue := strings.Fields(valSplitOnDelim[1])
 
-		entries = append(entries, Entry{ signalPaterns: signalPaterns, outputValue: outputValue})
+		entries = append(entries, Entry{ signalPaterns: signalPaterns, outputValue: outputValue })
 	}
 
 	return entries

@@ -5,10 +5,6 @@ import (
 
 	"github.com/shayd3/advent-of-code-2021/inputs"
 )
-type Lanternfish struct {
-	lifespan int
-	lifespanRefresh bool
-}
 
 func Day06() {
 	// inputs := inputs.Day06Sample
