@@ -62,5 +62,13 @@
             "program": "main.go",
             "args": ["7"]
         },
+        {
+            "name": "Day 08",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "main.go",
+            "args": ["8"]
+        },
     ]
 }

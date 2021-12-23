@@ -2,6 +2,7 @@ package days
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/shayd3/advent-of-code-2021/inputs"
@@ -15,11 +16,13 @@ type Entry struct {
 }
 
 func Day08() {
-	// input := inputs.Day08Sample
-	input := inputs.Day08
+	input := inputs.Day08Sample
+	// input := inputs.Day08
 	entries := parseInput(input)
 	count := findEasyDigitsCount(entries)
 	fmt.Printf("Total times 1, 4, 7, or 8 appeared: %d\n", count)
+	totalSum := totalOutputValues(entries)
+	fmt.Printf("Total sum of all output values: %d\n", totalSum)
 }
 
 func parseInput(input []string) []Entry {
@@ -51,6 +54,8 @@ len = number
 6 => 0,6,9
 	- Contains 4 -> 9
 	- Else -> [0,6]
+		- if contains 7 -> 0
+		- else -> 6
 */
 
 // findEasyDigitsCount finds total count of how many times
@@ -68,4 +73,49 @@ func findEasyDigitsCount(entries []Entry) int {
 		}
 	}
 	return count
+}
+
+// totalOutputValues - Calculates digit for each slice of 
+// Entry.outputValue and returns sum
+func totalOutputValues(entries []Entry) int {
+	sum := 0
+	for _, entry := range entries {
+		strOutput := ""
+		for _, outputVal := range entry.outputValue {
+			switch len(outputVal) {
+			case 2: strOutput += "1"; // 1
+			case 3: strOutput += "7"; // 7
+			case 4: strOutput += "4"; // 4
+			case 7: strOutput += "8"; // 8
+			case 5:  { // 2,3,5
+				if strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'b') || 
+				   strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') || 
+				   strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'g') {
+					strOutput += "3"
+				} else if strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') ||
+						  strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') {
+					strOutput += "5"
+				} else { // 2
+					strOutput += "2"
+				}
+			}
+			case 6: {// 0,6,9
+				// Check if 6 segments contains 4
+				if strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'g') || 
+				   strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'g') ||
+				   strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') {
+					strOutput += "9"
+				// If 6 segments contains 7, it's 0
+				} else if strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'g') && strings.ContainsRune(outputVal, 'c') {
+					strOutput += "0"
+				} else {
+					strOutput += "6"
+				}
+			}
+			}
+		}
+		intOutput, _ := strconv.Atoi(strOutput)
+		sum += intOutput
+	}
+	return sum
 } 
