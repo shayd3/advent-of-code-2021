@@ -2,6 +2,8 @@ package days
 
 import (
 	"fmt"
+	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/shayd3/advent-of-code-2021/inputs"
@@ -111,13 +113,37 @@ func totalOutputValues(entries []Entry) int {
 				}
 			}
 		}
-		// strVal := ""
-		// for _, outputVal := range entry.outputValue {
-			
-		// }
-		// intOutput, _ := strconv.Atoi(strOutput)
-		// sum += intOutput
-		fmt.Println(digitMap)
+		
+		strVal := ""
+		for _, outputVal := range entry.outputValue {
+			for key, signalVal := range digitMap {
+				if sortString(signalVal) == sortString(outputVal) {
+					strVal += fmt.Sprint(key)
+				}
+			}
+		}
+		intOutput, _ := strconv.Atoi(strVal)
+		sum += intOutput
 	}
 	return sum
-} 
+}
+
+func sortString(input string) string {
+	runeArray := []rune(input)
+	sort.Sort(sortRuneString(runeArray))
+	return string(runeArray)
+}
+
+type sortRuneString []rune
+
+func (s sortRuneString) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s sortRuneString) Less(i, j int) bool {
+	return s[i] < s[j]
+}
+
+func (s sortRuneString) Len() int {
+	return len(s)
+}
