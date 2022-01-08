@@ -1,6 +1,7 @@
 package inputs
 
-var Day08Sample = []string {
+var Day08Sample = []string{
+	`acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf`,
 	`be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe`,
 	`edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc`,
 	`fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg`,
@@ -13,7 +14,7 @@ var Day08Sample = []string {
 	`gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce`,
 }
 
-var Day08 = []string {
+var Day08 = []string{
 	`abdfce bedag acdefgb cg febcga fbdac fcdg cabdg bcg bgacdf | fdcab adbcf gcb acdebf`,
 	`bgeacdf dgebca gbc fbgd fceba fecdg bcgef cfgbde gb fegacd | dbfg abecf dfgb gaecdf`,
 	`dfega bedag af agf fdagcb cbaedgf feac dfecg dcegfa gcfdbe | fag edcgf fga bfgcad`,

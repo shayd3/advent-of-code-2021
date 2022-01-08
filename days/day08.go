@@ -2,7 +2,6 @@ package days
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/shayd3/advent-of-code-2021/inputs"
@@ -11,13 +10,13 @@ import (
 const DELIMITER string = "|"
 
 type Entry struct {
-	signalPaterns []string
+	signalPatterns []string
 	outputValue []string
 }
 
 func Day08() {
-	input := inputs.Day08Sample
-	// input := inputs.Day08
+	// input := inputs.Day08Sample
+	input := inputs.Day08
 	entries := parseInput(input)
 	count := findEasyDigitsCount(entries)
 	fmt.Printf("Total times 1, 4, 7, or 8 appeared: %d\n", count)
@@ -29,34 +28,14 @@ func parseInput(input []string) []Entry {
 	entries := []Entry{}
 	for _, val := range input {
 		valSplitOnDelim := strings.Split(val, DELIMITER)
-		signalPaterns := strings.Fields(valSplitOnDelim[0])
+		signalPatterns := strings.Fields(valSplitOnDelim[0])
 		outputValue := strings.Fields(valSplitOnDelim[1])
 
-		entries = append(entries, Entry{ signalPaterns: signalPaterns, outputValue: outputValue })
+		entries = append(entries, Entry{ signalPatterns: signalPatterns, outputValue: outputValue })
 	}
 
 	return entries
 }
-/*
-break down of lengths:
-len = number
-
-2 => 1
-3 => 7
-4 => 4
-7 => 8
-
-5 => 2,3,5
-	- Contains 7 -> 3
-	- Else [2,5]
-		- intersects "4" in 3 places -> 5
-		- else -> 2
-6 => 0,6,9
-	- Contains 4 -> 9
-	- Else -> [0,6]
-		- if contains 7 -> 0
-		- else -> 6
-*/
 
 // findEasyDigitsCount finds total count of how many times
 // 1, 4, 7, and 8 in a slice of Entry objects
@@ -79,43 +58,66 @@ func findEasyDigitsCount(entries []Entry) int {
 // Entry.outputValue and returns sum
 func totalOutputValues(entries []Entry) int {
 	sum := 0
+
 	for _, entry := range entries {
-		strOutput := ""
-		for _, outputVal := range entry.outputValue {
-			switch len(outputVal) {
-			case 2: strOutput += "1"; // 1
-			case 3: strOutput += "7"; // 7
-			case 4: strOutput += "4"; // 4
-			case 7: strOutput += "8"; // 8
-			case 5:  { // 2,3,5
-				if strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'b') || 
-				   strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') || 
-				   strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'g') {
-					strOutput += "3"
-				} else if strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') ||
-						  strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') {
-					strOutput += "5"
-				} else { // 2
-					strOutput += "2"
-				}
-			}
-			case 6: {// 0,6,9
-				// Check if 6 segments contains 4
-				if strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'g') || 
-				   strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'g') ||
-				   strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'c') && strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'f') {
-					strOutput += "9"
-				// If 6 segments contains 7, it's 0
-				} else if strings.ContainsRune(outputVal, 'd') && strings.ContainsRune(outputVal, 'e') && strings.ContainsRune(outputVal, 'a') && strings.ContainsRune(outputVal, 'f') && strings.ContainsRune(outputVal, 'b') && strings.ContainsRune(outputVal, 'g') && strings.ContainsRune(outputVal, 'c') {
-					strOutput += "0"
-				} else {
-					strOutput += "6"
-				}
-			}
+		digitMap := make(map[int]string)
+
+		// Known easy digits
+		for _, signalPattern := range entry.signalPatterns {
+			switch len(signalPattern) {
+				case 2: digitMap[1] = signalPattern;
+				case 4: digitMap[4] = signalPattern; 
+				case 3: digitMap[7] = signalPattern;
+				case 7: digitMap[8] = signalPattern;
 			}
 		}
-		intOutput, _ := strconv.Atoi(strOutput)
-		sum += intOutput
+		// There is absolutely a better way of doing it, but brute force is the easiest way atm
+		// Difficult digits - Find 0,6,9
+		for _, signalPattern := range entry.signalPatterns {
+			// 0,6,9
+			if len(signalPattern) == 6 {
+				// If signalPattern contains "4", it's 9
+				if  strings.ContainsRune(signalPattern, rune(digitMap[4][0])) &&
+				strings.ContainsRune(signalPattern, rune(digitMap[4][1])) &&
+				strings.ContainsRune(signalPattern, rune(digitMap[4][2])) &&
+				strings.ContainsRune(signalPattern, rune(digitMap[4][3])) {
+					digitMap[9] = signalPattern
+				// If signalPattern contains "1", it's 0
+				} else if (strings.ContainsRune(signalPattern, rune(digitMap[1][0])) && 
+				strings.ContainsRune(signalPattern, rune(digitMap[1][1]))) {
+					digitMap[0] = signalPattern
+				} else {
+					digitMap[6] = signalPattern
+				}
+			}
+		}
+
+		// More difficult digits - find 2,3,5
+		for _, signalPattern := range entry.signalPatterns {
+			if len(signalPattern) == 5 {
+				// if 5 is in 6
+				if  strings.ContainsRune(digitMap[6], rune(signalPattern[0])) &&
+				strings.ContainsRune(digitMap[6], rune(signalPattern[1])) &&
+				strings.ContainsRune(digitMap[6], rune(signalPattern[2])) &&
+				strings.ContainsRune(digitMap[6], rune(signalPattern[3])) &&
+				strings.ContainsRune(digitMap[6], rune(signalPattern[4])) {
+					digitMap[5] = signalPattern
+				// if 1 is in 3
+				} else if strings.ContainsRune(signalPattern, rune(digitMap[1][0])) && 
+				strings.ContainsRune(signalPattern, rune(digitMap[1][1])) {
+					digitMap[3] = signalPattern
+				} else {
+					digitMap[2] = signalPattern
+				}
+			}
+		}
+		// strVal := ""
+		// for _, outputVal := range entry.outputValue {
+			
+		// }
+		// intOutput, _ := strconv.Atoi(strOutput)
+		// sum += intOutput
+		fmt.Println(digitMap)
 	}
 	return sum
 } 
